@@ -10,6 +10,9 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://octanebula.dev').toString();
+
+// Site version. Bump manually.
+const version = 'v1.0.2';
 ---
 <!doctype html>
 <html lang="en">
@@ -52,7 +55,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://octanebula.
       <span>octanebula.dev</span>
       <span class="footer-right">
         <a id="sauce-link" class="sauce" href="https://github.com/octanebula/website">sauce</a>
-        <span class="ver">v1.0.0</span>
+        <span class="ver">{version}</span>
       </span>
     </footer>
 
