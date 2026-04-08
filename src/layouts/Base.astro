@@ -30,8 +30,72 @@ const { title = 'octanebula.dev' } = Astro.props;
     <slot />
     <footer class="site-footer">
       <span>octanebula.dev</span>
-      <span class="ver">v0.1.0</span>
+      <span class="footer-right">
+        <a id="sauce-link" class="sauce" href="https://github.com/octanebula/website">sauce</a>
+        <span class="ver">v1.0.0</span>
+      </span>
     </footer>
+
+    <div id="sauce-gate" class="sauce-gate" hidden>
+      <div class="sauce-card">
+        <div class="sauce-tag">⚠ ai slop warning</div>
+        <h2 class="sauce-title">you sure about that?</h2>
+        <p>
+          fair warning: this entire site was vibe-coded with claude. the repo
+          is mostly <code>.astro</code> files i barely read before merging.
+        </p>
+        <p>
+          if you came here looking for clean handwritten code, beautifully
+          architected components, or any sign of human suffering, you'll be
+          disappointed.
+        </p>
+        <p class="sauce-fineprint">
+          if you came here for proof that vibecoding can in fact ship a real
+          website, welcome.
+        </p>
+        <a id="sauce-continue" class="sauce-btn" href="https://github.com/octanebula/website" target="_blank" rel="noopener">i'll risk it</a>
+        <a id="sauce-bail" class="sauce-bail" href="#">nevermind, take me back</a>
+      </div>
+    </div>
+
+    <script>
+      const sauceLink = document.getElementById('sauce-link');
+      const sauceGate = document.getElementById('sauce-gate');
+      const sauceContinue = document.getElementById('sauce-continue');
+      const sauceBail = document.getElementById('sauce-bail');
+
+      const openGate = () => {
+        if (!sauceGate) return;
+        sauceGate.hidden = false;
+        document.body.style.overflow = 'hidden';
+        requestAnimationFrame(() => sauceGate.classList.add('open'));
+      };
+      const closeGate = () => {
+        if (!sauceGate) return;
+        sauceGate.classList.remove('open');
+        document.body.style.overflow = '';
+        setTimeout(() => { sauceGate.hidden = true; }, 220);
+      };
+
+      sauceLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        openGate();
+      });
+      sauceContinue?.addEventListener('click', () => {
+        // let the link open, then close the gate
+        setTimeout(closeGate, 100);
+      });
+      sauceBail?.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeGate();
+      });
+      sauceGate?.addEventListener('click', (e) => {
+        if (e.target === sauceGate) closeGate();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sauceGate && !sauceGate.hidden) closeGate();
+      });
+    </script>
   </body>
 </html>
 
@@ -141,5 +205,88 @@ const { title = 'octanebula.dev' } = Astro.props;
   h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
   hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
   .site-footer { display: flex; justify-content: space-between; margin-top: 4rem; padding-top: 1.25rem; border-top: 1px solid var(--border); color: var(--fg-dim); font-family: var(--mono); font-size: 0.78rem; }
+  .footer-right { display: inline-flex; gap: 0.65rem; align-items: center; }
+  .sauce { color: var(--fg-dim); text-decoration: underline dotted; text-underline-offset: 3px; }
+  .sauce:hover { color: var(--fg); text-decoration: underline; }
   .ver::before { content: '· '; }
+
+  /* sauce / ai slop warning gate */
+  .sauce-gate {
+    position: fixed; inset: 0; z-index: 300;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem;
+    background: rgba(5, 6, 15, 0.78);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    opacity: 0;
+    transition: opacity 220ms ease, backdrop-filter 220ms ease;
+  }
+  .sauce-gate.open {
+    opacity: 1;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .sauce-gate[hidden] { display: none; }
+  .sauce-card {
+    max-width: 480px;
+    background: rgba(16, 20, 42, 0.92);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.6rem 1.6rem 1.4rem;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+    transform: scale(0.96);
+    transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  }
+  .sauce-gate.open .sauce-card { transform: scale(1); }
+  .sauce-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--tag-wip);
+    border: 1px solid var(--tag-wip);
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    margin-bottom: 0.85rem;
+    text-transform: lowercase;
+  }
+  .sauce-title { margin: 0 0 0.85rem; font-size: 1.3rem; line-height: 1.25; color: var(--fg); }
+  .sauce-card p { margin: 0.55rem 0; color: var(--fg); font-size: 0.92rem; line-height: 1.55; }
+  .sauce-card code {
+    font-family: var(--mono);
+    background: rgba(7, 9, 26, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.05rem 0.35rem;
+    font-size: 0.85em;
+  }
+  .sauce-fineprint { color: var(--fg-dim) !important; font-size: 0.84rem !important; font-style: italic; }
+  .sauce-btn {
+    display: block;
+    margin-top: 1rem;
+    width: 100%;
+    background: var(--accent);
+    color: #07091a;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: filter 140ms ease, transform 140ms ease;
+  }
+  .sauce-btn:hover { filter: brightness(1.1); transform: translateY(-1px); text-decoration: none; }
+  .sauce-bail {
+    display: block;
+    text-align: center;
+    margin-top: 0.75rem;
+    color: var(--fg-dim);
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .sauce-bail:hover { color: var(--fg); }
 </style>
