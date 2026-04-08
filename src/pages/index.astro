@@ -1,0 +1,218 @@
+---
+import Base from '../layouts/Base.astro';
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import pfp from '../assets/pfp.jpg';
+
+const all = await getCollection('entries');
+all.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const pinned = all.filter((e) => e.data.pinned);
+const feed = all.filter((e) => !e.data.pinned);
+
+const tags = ['all', 'shipped', 'wip', 'writing', 'note', 'release'] as const;
+
+function fmtDate(d: Date) {
+  return d.toISOString().slice(0, 10);
+}
+---
+<Base>
+  <header class="hero">
+    <div class="hero-top">
+      <Image class="pfp" src={pfp} alt="Octavian" width={144} height={144} loading="eager" />
+      <div class="hero-text">
+        <div class="name-row">
+          <h1>Octavian <span class="alias">@octanebula</span></h1>
+          <span class="check" title="Verified Roblox developer">✓</span>
+        </div>
+        <p class="bio">
+          19, CS undergrad in Croatia. Co-owner of <strong>Topline Studios</strong>,
+          UI designer at <strong>Marmot's Oven</strong>. I make Roblox games and
+          write code.
+        </p>
+        <nav class="socials">
+          <a href="https://twitter.com/octanebula">xitter</a>
+          <a href="https://github.com/octanebula">github</a>
+          <a href="https://www.roblox.com/users/octanebula">roblox</a>
+          <a href="mailto:hi@octanebula.dev">email</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  {pinned.length > 0 && (
+    <section class="pinned">
+      <h2 class="section-label">// pinned</h2>
+      <ul class="entries">
+        {pinned.map((entry) => (
+          <li class="entry">
+            <div class="entry-meta">
+              <time datetime={entry.data.date.toISOString()}>{fmtDate(entry.data.date)}</time>
+              <span class={`tag tag-${entry.data.tag}`}>{entry.data.tag}</span>
+            </div>
+            <h3 class="entry-title">
+              {entry.data.link
+                ? <a href={entry.data.link}>{entry.data.title}</a>
+                : entry.data.title}
+            </h3>
+            <div class="entry-body" set:html={entry.rendered?.html ?? ''} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <section class="feed">
+    <div class="feed-header">
+      <h2 class="section-label">// feed</h2>
+      <div class="filters">
+        {tags.map((t) => <button class="filter" data-tag={t}>{t}</button>)}
+      </div>
+    </div>
+    <ul class="entries">
+      {feed.map((entry) => (
+        <li class="entry" data-tag={entry.data.tag}>
+          <div class="entry-meta">
+            <time datetime={entry.data.date.toISOString()}>{fmtDate(entry.data.date)}</time>
+            <span class={`tag tag-${entry.data.tag}`}>{entry.data.tag}</span>
+          </div>
+          <h3 class="entry-title">
+            {entry.data.link
+              ? <a href={entry.data.link}>{entry.data.title}</a>
+              : entry.data.title}
+          </h3>
+          <div class="entry-body" set:html={entry.rendered?.html ?? ''} />
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter');
+  const items = document.querySelectorAll<HTMLLIElement>('.feed .entry');
+  let active = 'all';
+  buttons.forEach((b) => {
+    if (b.dataset.tag === active) b.classList.add('on');
+    b.addEventListener('click', () => {
+      active = b.dataset.tag || 'all';
+      buttons.forEach((x) => x.classList.toggle('on', x.dataset.tag === active));
+      items.forEach((it) => {
+        const show = active === 'all' || it.dataset.tag === active;
+        it.style.display = show ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    margin-bottom: 3rem;
+    padding: 1.4rem 0.5rem;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: -10% -8%;
+    background: radial-gradient(
+      ellipse 90% 85% at 50% 50%,
+      rgba(7, 9, 26, 0.88) 0%,
+      rgba(7, 9, 26, 0.6) 45%,
+      transparent 80%
+    );
+    filter: blur(20px);
+    z-index: -1;
+    pointer-events: none;
+  }
+  .hero-top { display: flex; gap: 1.1rem; align-items: center; position: relative; }
+  .pfp {
+    width: 72px; height: 72px; border-radius: 50%;
+    border: 1px solid var(--border);
+    object-fit: cover; flex-shrink: 0;
+    background: var(--bg-elev);
+  }
+  .hero-text { min-width: 0; }
+  .name-row { display: flex; align-items: center; gap: 0.55rem; }
+  h1 { font-size: 1.6rem; margin: 0; }
+  .alias { color: var(--fg-dim); font-weight: 400; font-family: var(--mono); font-size: 0.95rem; margin-left: 0.35rem; }
+  .check {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.1rem; height: 1.1rem; border-radius: 999px;
+    background: var(--accent); color: #0b0c0e; font-size: 0.7rem; font-weight: 800;
+  }
+  .bio { color: var(--fg); margin: 0.6rem 0 1rem; }
+  .bio strong { color: var(--accent); font-weight: 600; }
+  .socials { display: flex; gap: 1.1rem; font-family: var(--mono); font-size: 0.86rem; }
+  .socials a { color: var(--fg-dim); }
+  .socials a:hover { color: var(--accent); }
+
+  .section-label {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--fg-dim);
+    text-transform: lowercase;
+    margin: 2.5rem 0 1rem;
+    font-weight: 500;
+    padding: 0.2rem 0.6rem;
+    background: rgba(19, 20, 24, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .feed-header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .filters { display: flex; gap: 0.4rem; }
+  .filter {
+    background: rgba(19, 20, 24, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border); color: var(--fg-dim);
+    font-family: var(--mono); font-size: 0.72rem; padding: 0.2rem 0.55rem;
+    border-radius: 999px; cursor: pointer; text-transform: lowercase;
+    transition: color 140ms ease, background 140ms ease, border-color 140ms ease;
+  }
+  .filter:hover { color: var(--fg); }
+  .filter.on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+  .entries { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.85rem; }
+  .entry {
+    padding: 1.1rem 1.25rem;
+    background: rgba(19, 20, 24, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+  }
+  .entry:hover {
+    transform: translateY(-2px);
+    border-color: #2f3540;
+    background: rgba(22, 24, 30, 0.85);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(124, 156, 255, 0.08);
+  }
+  .entry-meta { display: flex; align-items: center; gap: 0.75rem; font-family: var(--mono); font-size: 0.74rem; color: var(--fg-dim); margin-bottom: 0.35rem; }
+  .entry-title { margin: 0 0 0.4rem; font-size: 1.05rem; }
+  .entry-body { color: var(--fg); font-size: 0.94rem; }
+  .entry-body :global(p) { margin: 0.4rem 0; }
+  .entry-body :global(p:first-child) { margin-top: 0; }
+
+  .tag {
+    display: inline-block; padding: 0.05rem 0.45rem;
+    border-radius: 3px; font-size: 0.68rem; text-transform: lowercase;
+    border: 1px solid currentColor;
+  }
+  .tag-shipped { color: var(--tag-shipped); }
+  .tag-wip { color: var(--tag-wip); }
+  .tag-writing { color: var(--tag-writing); }
+  .tag-note { color: var(--tag-note); }
+  .tag-release { color: var(--tag-release); }
+
+  .pinned .entry-title::before {
+    content: '★ ';
+    color: var(--tag-wip);
+    font-size: 0.85em;
+  }
+</style>

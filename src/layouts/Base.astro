@@ -1,0 +1,99 @@
+---
+import FloatingLines from '../components/FloatingLines.astro';
+interface Props {
+  title?: string;
+}
+const { title = 'octanebula.dev' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="darkreader-lock" />
+    <meta name="description" content="Karlo (Octavian / @octanebula) — CS student, Roblox dev, UI designer. A living changelog." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <FloatingLines />
+    <nav class="topbar">
+      <a class="brand" href="/">octanebula.dev</a>
+      <div class="topbar-links">
+        <a href="/">log</a>
+        <a href="/about">about</a>
+        <a href="/commissions">commissions</a>
+        <a href="/gallery">ui gallery</a>
+      </div>
+    </nav>
+    <slot />
+    <footer class="site-footer">
+      <span>octanebula.dev</span>
+      <span class="ver">v0.1.0</span>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: dark;
+    --bg: #07091a;
+    --bg-elev: #10142a;
+    --border: #22252b;
+    --fg: #e6e6e6;
+    --fg-dim: #8a8f98;
+    --accent: #7c9cff;
+    --tag-shipped: #5dd39e;
+    --tag-wip: #f4b740;
+    --tag-writing: #c792ea;
+    --tag-note: #8a8f98;
+    --tag-release: #7c9cff;
+    --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, system-ui, "Inter", Segoe UI, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html {
+    background:
+      radial-gradient(ellipse 100% 70% at 50% 0%, #0f1740 0%, #07091a 55%, #05060f 100%);
+    background-attachment: fixed;
+  }
+  html::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(180, 200, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(180, 200, 255, 0.045) 1px, transparent 1px);
+    background-size: 40px 40px, 40px 40px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 30%, #000 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 30%, #000 40%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body { margin: 0; padding: 0; color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  body { max-width: 720px; margin: 0 auto; padding: 5.5rem 1.5rem 6rem; line-height: 1.55; position: relative; }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.85rem 1.5rem;
+    background: rgba(11, 12, 14, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    z-index: 10;
+  }
+  .topbar .brand { color: var(--fg); font-weight: 600; }
+  .topbar .brand:hover { text-decoration: none; color: var(--accent); }
+  .topbar-links { display: flex; gap: 1.25rem; }
+  .topbar-links a { color: var(--fg-dim); }
+  .topbar-links a:hover { color: var(--fg); text-decoration: none; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+  .site-footer { display: flex; justify-content: space-between; margin-top: 4rem; padding-top: 1.25rem; border-top: 1px solid var(--border); color: var(--fg-dim); font-family: var(--mono); font-size: 0.78rem; }
+  .ver::before { content: '· '; }
+</style>

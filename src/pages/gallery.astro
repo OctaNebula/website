@@ -1,0 +1,237 @@
+---
+import Base from '../layouts/Base.astro';
+import { Image } from 'astro:assets';
+
+const modules = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/gallery/*.{png,jpg,jpeg,webp,avif,gif}',
+  { eager: true }
+);
+
+const images = Object.entries(modules)
+  .map(([path, mod]) => ({
+    src: mod.default,
+    name: path.split('/').pop()!.replace(/\.[^.]+$/, ''),
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+---
+<Base title="gallery — octanebula.dev">
+  <div id="gate" class="gate">
+    <div class="gate-card">
+      <div class="gate-tag">⚠ spooky scary warning</div>
+      <h1 class="gate-title">read this before you judge me</h1>
+      <p>
+        Most of what's in this gallery is leftover from the dark ages of grinding
+        commissions (and getting wildly underpaid) on HiddenDevs. It does NOT
+        represent how I work now.
+      </p>
+      <p>
+        If you actually want to see my current UI work, go play
+        <strong>Mafia</strong> or <strong>Steel Crossfire</strong>. This page is
+        more of an archive than a portfolio.
+      </p>
+      <p class="gate-fineprint">
+        I will eventually replace all of this. Probably. Maybe. Don't hold me to it.
+      </p>
+      <button id="gate-dismiss" class="gate-btn">fine, show me anyway</button>
+      <a class="gate-bail" href="/">nope, take me back</a>
+    </div>
+  </div>
+
+  <h1 class="page-title">gallery</h1>
+  <p class="page-lead">Click anything to embiggen.</p>
+
+  {images.length === 0 ? (
+    <p class="empty">Nothing here yet. Drop images into <code>src/assets/gallery/</code>.</p>
+  ) : (
+    <div class="grid">
+      {images.map((img) => (
+        <button class="tile" data-full={img.src.src} data-alt={img.name}>
+          <Image src={img.src} alt={img.name} widths={[400, 800]} sizes="(max-width: 600px) 50vw, 240px" />
+        </button>
+      ))}
+    </div>
+  )}
+
+  <div id="lightbox" class="lightbox" hidden>
+    <button class="lb-close" aria-label="Close">×</button>
+    <img class="lb-img" alt="" />
+  </div>
+</Base>
+
+<script>
+  const gate = document.getElementById('gate');
+  const dismiss = document.getElementById('gate-dismiss');
+  if (gate && dismiss) {
+    document.body.style.overflow = 'hidden';
+    dismiss.addEventListener('click', () => {
+      gate.classList.add('gone');
+      document.body.style.overflow = '';
+      setTimeout(() => gate.remove(), 300);
+    });
+  }
+
+  const lightbox = document.getElementById('lightbox') as HTMLDivElement | null;
+  const lbImg = lightbox?.querySelector('.lb-img') as HTMLImageElement | null;
+  const lbClose = lightbox?.querySelector('.lb-close') as HTMLButtonElement | null;
+
+  const closeLb = () => {
+    if (!lightbox || !lbImg) return;
+    lightbox.hidden = true;
+    lbImg.src = '';
+    document.body.style.overflow = '';
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('.tile').forEach((tile) => {
+    tile.addEventListener('click', () => {
+      if (!lightbox || !lbImg) return;
+      lbImg.src = tile.dataset.full || '';
+      lbImg.alt = tile.dataset.alt || '';
+      lightbox.hidden = false;
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  lbClose?.addEventListener('click', closeLb);
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLb();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightbox && !lightbox.hidden) closeLb();
+  });
+</script>
+
+<style>
+  .page-title { font-size: 1.6rem; margin: 0 0 0.5rem; }
+  .page-lead { color: var(--fg-dim); margin: 0 0 1.5rem; }
+  .empty { color: var(--fg-dim); font-family: var(--mono); font-size: 0.85rem; }
+  .empty code {
+    background: rgba(16, 20, 42, 0.7);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.75rem;
+  }
+  .tile {
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(16, 20, 42, 0.6);
+    cursor: zoom-in;
+    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  }
+  .tile:hover {
+    transform: translateY(-2px);
+    border-color: #2f3540;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+  .tile :global(img) {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+
+  /* gate */
+  .gate {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem;
+    background: rgba(5, 6, 15, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: opacity 280ms ease;
+  }
+  .gate.gone { opacity: 0; pointer-events: none; }
+  .gate-card {
+    position: relative;
+    max-width: 520px;
+    background: rgba(16, 20, 42, 0.92);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem 1.75rem 1.5rem;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  }
+  .gate-bail {
+    display: block;
+    text-align: center;
+    margin-top: 0.75rem;
+    color: var(--fg-dim);
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .gate-bail:hover { color: var(--fg); }
+  .gate-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--tag-wip);
+    border: 1px solid var(--tag-wip);
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    margin-bottom: 0.85rem;
+    text-transform: lowercase;
+  }
+  .gate-title {
+    margin: 0 0 0.85rem;
+    font-size: 1.4rem;
+    line-height: 1.25;
+  }
+  .gate-card p {
+    margin: 0.55rem 0;
+    color: var(--fg);
+    font-size: 0.94rem;
+  }
+  .gate-card strong { color: var(--accent); }
+  .gate-fineprint { color: var(--fg-dim); font-size: 0.82rem; font-style: italic; }
+  .gate-btn {
+    margin-top: 1rem;
+    width: 100%;
+    background: var(--accent);
+    color: #07091a;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 140ms ease, transform 140ms ease;
+  }
+  .gate-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .gate-btn:active { transform: translateY(0); }
+
+  /* lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(5, 6, 15, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 2.5rem;
+    cursor: zoom-out;
+  }
+  .lightbox[hidden] { display: none; }
+  .lb-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+  }
+  .lb-close {
+    position: absolute; top: 1rem; right: 1.25rem;
+    background: transparent; border: none;
+    color: var(--fg); font-size: 2rem; cursor: pointer;
+    line-height: 1; padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+  }
+  .lb-close:hover { background: rgba(255, 255, 255, 0.08); }
+</style>
