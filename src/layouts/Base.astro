@@ -2,8 +2,14 @@
 import FloatingLines from '../components/FloatingLines.astro';
 interface Props {
   title?: string;
+  description?: string;
 }
-const { title = 'octanebula.dev' } = Astro.props;
+const {
+  title = 'octanebula.dev',
+  description = "Karlo (Octavian / @octanebula). 19, CS undergrad in Croatia. Verified Roblox dev, UI designer, co-owner of Topline Studios. A living changelog of what i'm shipping.",
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://octanebula.dev').toString();
 ---
 <!doctype html>
 <html lang="en">
@@ -12,9 +18,23 @@ const { title = 'octanebula.dev' } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
     <meta name="darkreader-lock" />
-    <meta name="description" content="Karlo (Octavian / @octanebula) — CS student, Roblox dev, UI designer. A living changelog." />
+    <meta name="theme-color" content="#0f1740" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="octanebula.dev" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@octanebula" />
+    <meta name="twitter:creator" content="@octanebula" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
   </head>
   <body>
     <FloatingLines />
