@@ -226,8 +226,19 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://octanebula.
   hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
   .site-footer { display: flex; justify-content: space-between; margin-top: 4rem; padding-top: 1.25rem; border-top: 1px solid var(--border); color: var(--fg-dim); font-family: var(--mono); font-size: 0.78rem; }
   .footer-right { display: inline-flex; gap: 0.65rem; align-items: center; }
-  .sauce { color: var(--fg-dim); text-decoration: underline dotted; text-underline-offset: 3px; }
-  .sauce:hover { color: var(--fg); text-decoration: underline; }
+  .sauce {
+    display: inline-block;
+    line-height: 1;
+    color: var(--fg-dim);
+    text-decoration: none;
+    border-bottom: 1px dotted currentColor;
+    padding-bottom: 2px;
+  }
+  .sauce:hover {
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom-style: solid;
+  }
   .ver::before { content: '· '; }
 
   /* sauce / ai slop warning gate */
