@@ -1,8 +1,9 @@
 ---
 title: "Mafia"
-date: 2026-02-15
+date: 2025-09-07
 tag: shipped
 pinned: true
+link: https://www.roblox.com/games/113232329524315/MAFIA
 ---
 
 1920s asymmetrical noir murder mystery on Roblox. I co-own Topline Studios and led

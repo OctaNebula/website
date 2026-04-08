@@ -1,6 +1,6 @@
 ---
 title: "edgar-plus"
-date: 2025-10-12
+date: 2025-12-09
 tag: shipped
 link: https://github.com/octanebula/edgar-plus
 ---

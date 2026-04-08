@@ -26,7 +26,10 @@ const images = Object.entries(modules)
       </p>
       <p>
         If you actually want to see my current UI work, go play
-        <strong>Mafia</strong> or <strong>Steel Crossfire</strong>. This page is
+        <a href="https://www.roblox.com/games/113232329524315/MAFIA"><strong>Mafia</strong></a>
+        or
+        <a href="https://www.roblox.com/games/133197203959042/Steel-Crossfire"><strong>Steel Crossfire</strong></a>.
+        This page is
         more of an archive than a portfolio.
       </p>
       <p class="gate-fineprint">
@@ -46,7 +49,7 @@ const images = Object.entries(modules)
     <div class="grid">
       {images.map((img) => (
         <button class="tile" data-full={img.src.src} data-alt={img.name}>
-          <Image src={img.src} alt={img.name} widths={[400, 800]} sizes="(max-width: 600px) 50vw, 240px" />
+          <Image src={img.src} alt={img.name} widths={[400, 800]} sizes="(max-width: 600px) 50vw, 240px" loading="lazy" decoding="async" />
         </button>
       ))}
     </div>
@@ -76,9 +79,12 @@ const images = Object.entries(modules)
 
   const closeLb = () => {
     if (!lightbox || !lbImg) return;
-    lightbox.hidden = true;
-    lbImg.src = '';
+    lightbox.classList.remove('open');
     document.body.style.overflow = '';
+    setTimeout(() => {
+      lightbox.hidden = true;
+      lbImg.src = '';
+    }, 220);
   };
 
   document.querySelectorAll<HTMLButtonElement>('.tile').forEach((tile) => {
@@ -88,6 +94,7 @@ const images = Object.entries(modules)
       lbImg.alt = tile.dataset.alt || '';
       lightbox.hidden = false;
       document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => lightbox.classList.add('open'));
     });
   });
 
@@ -112,9 +119,14 @@ const images = Object.entries(modules)
   }
 
   .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 0.75rem;
+  }
+  .grid .tile { flex: 0 0 calc((100% - 1.5rem) / 3); }
+  @media (max-width: 600px) {
+    .grid .tile { flex: 0 0 calc((100% - 0.75rem) / 2); }
   }
   .tile {
     padding: 0;
@@ -213,10 +225,17 @@ const images = Object.entries(modules)
     position: fixed; inset: 0; z-index: 200;
     display: flex; align-items: center; justify-content: center;
     background: rgba(5, 6, 15, 0.92);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
     padding: 2.5rem;
     cursor: zoom-out;
+    opacity: 0;
+    transition: opacity 220ms ease, backdrop-filter 220ms ease;
+  }
+  .lightbox.open {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   .lightbox[hidden] { display: none; }
   .lb-img {
@@ -225,7 +244,11 @@ const images = Object.entries(modules)
     object-fit: contain;
     border-radius: 6px;
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+    transform: scale(0.96);
+    opacity: 0;
+    transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2), opacity 220ms ease;
   }
+  .lightbox.open .lb-img { transform: scale(1); opacity: 1; }
   .lb-close {
     position: absolute; top: 1rem; right: 1.25rem;
     background: transparent; border: none;

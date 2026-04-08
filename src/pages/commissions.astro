@@ -19,8 +19,10 @@ import Base from '../layouts/Base.astro';
   <section class="block">
     <h2>the short version</h2>
     <p>
-      I'm a UI designer for Roblox games. Three years in. Currently doing it for
-      <strong>Marmot's Oven</strong> and as co-owner of <strong>Topline Studios</strong>.
+      I'm a UI designer for Roblox games. Four years in. Currently doing it for
+      <a href="https://www.roblox.com/communities/33895110/Marmots-Oven"><strong>Marmot's Oven</strong></a>
+      and as co-owner of
+      <a href="https://www.roblox.com/communities/5670504/TOPLINE-STUDIOS-INC"><strong>Topline Studios</strong></a>.
       Roblox verified me. I make UI in <strong>Photoshop</strong>, ship it fast, and
       I don't make you pay for the first draft and then ghost.
     </p>
@@ -39,7 +41,7 @@ import Base from '../layouts/Base.astro';
   <section class="block">
     <h2>what i don't do</h2>
     <ul class="bullets dont">
-      <li>charge per "frame." what's a frame? a rectangle? cool, here's my $80 invoice for a div.</li>
+      <li>charge per "frame." what's a frame? a rectangle? cool, here's my $60 invoice for a div.</li>
       <li>vending-machine commissions. you don't insert a coin and get a mediocre menu screen. we talk first.</li>
       <li>Figma. i tried. i hated it. Photoshop has been working for 30 years and i'm not switching because a venture-backed app told me to.</li>
       <li>silently disappear for two weeks then send you a half-finished PSD with the layers named <code>Layer 14 copy 3</code>.</li>
@@ -47,9 +49,25 @@ import Base from '../layouts/Base.astro';
   </section>
 
   <section class="block">
+    <h2>what i can design</h2>
+    <p>
+      <strong>everything<sup class="ast">*</sup></strong>. cyberpunk, cartoon, brutalist,
+      neon, horror, prestige AAA, casual mobile slop. four years of jumping
+      between very different games means i've had to fake almost every aesthetic
+      at least once.
+    </p>
+    <p>
+      if you bring a style i haven't touched, i'll spend a day or two ripping
+      apart references until i actually get it. i don't half-ass something
+      unfamiliar and call it "a stylistic choice."
+    </p>
+    <p class="footnote">*okay fine. medieval fantasy. wood textures and scrollwork make my soul leave my body. don't ask.</p>
+  </section>
+
+  <section class="block">
     <h2>price</h2>
     <p>
-      Roughly <strong>$80–100</strong> for what most designers would call "one frame."
+      Roughly <strong>$60–100</strong> for what most designers would call "one frame."
       I say roughly because real pricing depends on complexity, scope, how much
       thinking it actually requires, and how nice you are in the DMs. A button is
       not the same as a full inventory screen and I refuse to pretend otherwise.
@@ -64,21 +82,37 @@ import Base from '../layouts/Base.astro';
   <section class="block">
     <h2>proof</h2>
     <p>
-      Receipts from people who've actually paid me. Coming soon (read: when I
-      get around to screenshotting Discord reactions).
+      Receipts from people who've actually paid me.
     </p>
     <div class="quotes">
-      <div class="quote-placeholder">
-        <span class="ph-label">screenshot slot 1</span>
+      <div class="quote" data-full="/quotes/enrise-insane.png" role="button" tabindex="0">
+        <img src="/quotes/enrise-insane.png" alt="Enrise reacting to UI work" />
+        <div class="caption">
+          <a class="handle" href="https://www.roblox.com/users/66878178/profile" target="_blank" rel="noopener">@Enr7se</a>
+          <img class="verified" src="/roblox-verified.png" alt="verified" width="16" height="16" />
+        </div>
       </div>
-      <div class="quote-placeholder">
-        <span class="ph-label">screenshot slot 2</span>
+      <div class="quote" data-full="/quotes/aisar-top-tier.png" role="button" tabindex="0">
+        <img src="/quotes/aisar-top-tier.png" alt="Aisar reacting to a bluff UI" />
+        <div class="caption">
+          <a class="handle" href="https://www.roblox.com/users/1721299790/profile" target="_blank" rel="noopener">@AisarRedux</a>
+          <img class="verified" src="/roblox-verified.png" alt="verified" width="16" height="16" />
+        </div>
       </div>
-      <div class="quote-placeholder">
-        <span class="ph-label">screenshot slot 3</span>
+      <div class="quote" data-full="/quotes/science-pretty-darn-good.png" role="button" tabindex="0">
+        <img src="/quotes/science-pretty-darn-good.png" alt="Sardiception reacting to a UI mockup" />
+        <div class="caption">
+          <a class="handle" href="https://www.roblox.com/users/495147639/profile" target="_blank" rel="noopener">@Sardiception</a>
+          <img class="verified" src="/roblox-verified.png" alt="verified" width="16" height="16" />
+        </div>
       </div>
     </div>
   </section>
+
+  <div id="lightbox" class="lightbox" hidden>
+    <button class="lb-close" aria-label="Close">×</button>
+    <img class="lb-img" alt="" />
+  </div>
 
   <section class="block contact">
     <h2>contact</h2>
@@ -92,6 +126,54 @@ import Base from '../layouts/Base.astro';
     </div>
   </section>
 </Base>
+
+<script>
+  const lightbox = document.getElementById('lightbox') as HTMLDivElement | null;
+  const lbImg = lightbox?.querySelector('.lb-img') as HTMLImageElement | null;
+  const lbClose = lightbox?.querySelector('.lb-close') as HTMLButtonElement | null;
+
+  const closeLb = () => {
+    if (!lightbox || !lbImg) return;
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      lightbox.hidden = true;
+      lbImg.src = '';
+    }, 220);
+  };
+
+  const openQuote = (el: HTMLElement) => {
+    if (!lightbox || !lbImg) return;
+    lbImg.src = el.dataset.full || '';
+    lbImg.alt = el.querySelector('img')?.alt || '';
+    lightbox.hidden = false;
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => lightbox.classList.add('open'));
+  };
+
+  document.querySelectorAll<HTMLDivElement>('.quote').forEach((tile) => {
+    tile.addEventListener('click', (e) => {
+      // Don't pop the lightbox if the click landed on the handle link.
+      if ((e.target as HTMLElement).closest('.handle')) return;
+      openQuote(tile);
+    });
+    tile.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        if ((e.target as HTMLElement).closest('.handle')) return;
+        e.preventDefault();
+        openQuote(tile);
+      }
+    });
+  });
+
+  lbClose?.addEventListener('click', closeLb);
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLb();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightbox && !lightbox.hidden) closeLb();
+  });
+</script>
 
 <style>
   .page-title { font-size: 1.7rem; margin: 0.5rem 0 0.4rem; }
@@ -157,6 +239,9 @@ import Base from '../layouts/Base.astro';
     padding: 0.05rem 0.35rem;
   }
   .fineprint { color: var(--fg-dim); font-size: 0.86rem; font-style: italic; }
+  .block p.footnote { color: var(--fg-dim); font-size: 0.82rem; font-style: italic; margin-top: 0.85rem; }
+  .footnote .fn-mark { white-space: nowrap; }
+  .ast { color: var(--fg-dim); font-weight: 400; font-size: 0.85em; vertical-align: super; line-height: 0; }
 
   .bullets {
     list-style: none;
@@ -198,6 +283,101 @@ import Base from '../layouts/Base.astro';
     justify-content: center;
     background: rgba(7, 9, 26, 0.4);
   }
+  .quote {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(7, 9, 26, 0.5);
+    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    cursor: zoom-in;
+  }
+  .quote:hover {
+    transform: translateY(-2px);
+    border-color: #2f3540;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+  .quote img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+  }
+  .quote .caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 0.75rem;
+    background: linear-gradient(to top, rgba(5, 6, 15, 0.92) 60%, rgba(5, 6, 15, 0));
+    transform: translateY(100%);
+    transition: transform 200ms ease;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--fg);
+    pointer-events: none;
+  }
+  .quote:hover .caption { transform: translateY(0); }
+  .quote .handle {
+    font-weight: 600;
+    color: var(--fg);
+    text-decoration: none;
+    pointer-events: auto;
+  }
+  .quote .handle:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .quote .verified {
+    width: 0.95rem;
+    height: 0.95rem;
+    flex-shrink: 0;
+  }
+
+  /* lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(5, 6, 15, 0.92);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    padding: 2.5rem;
+    cursor: zoom-out;
+    opacity: 0;
+    transition: opacity 220ms ease, backdrop-filter 220ms ease;
+  }
+  .lightbox.open {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .lightbox[hidden] { display: none; }
+  .lb-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+    transform: scale(0.96);
+    opacity: 0;
+    transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2), opacity 220ms ease;
+  }
+  .lightbox.open .lb-img { transform: scale(1); opacity: 1; }
+  .lb-close {
+    position: absolute; top: 1rem; right: 1.25rem;
+    background: transparent; border: none;
+    color: var(--fg); font-size: 2rem; cursor: pointer;
+    line-height: 1; padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+  }
+  .lb-close:hover { background: rgba(255, 255, 255, 0.08); }
   .ph-label {
     font-family: var(--mono);
     font-size: 0.72rem;

@@ -9,16 +9,16 @@ import Base from '../layouts/Base.astro';
     </div>
 
     <h1>octavian</h1>
-    <p class="tagline">aka @octanebula. CS student. Roblox dev. Occasional menace.</p>
+    <p class="tagline">aka @octanebula. CS student. Roblox dev. Occasional software freak.</p>
 
     <h2>about</h2>
     <p>
-      Hi, I'm Karlo. 19, born and currently slowly being crushed by my Computer
+      Hi, I'm Karlo. 19, born and currently slowly being crushed alive by my Computer
       Science degree at the University of Zagreb. Online I go by Octavian and
       use the @octanebula tag basically everywhere.
     </p>
     <p>
-      I've been doing UI/UX design for Roblox games for the past three years.
+      I've been doing UI/UX design for Roblox games for the past four years.
       Started by grinding HiddenDevs commissions. Eventually got tired of being
       underpaid and pivoted to working with people I actually like. That ended
       up being a much better idea.
@@ -26,25 +26,50 @@ import Base from '../layouts/Base.astro';
 
     <h2>currently</h2>
     <ul>
-      <li>co-owner of <strong>Topline Studios</strong>, where I lead game and UI design on <em>Mafia</em></li>
-      <li>UI designer at <strong>Marmot's Oven</strong>, working on <em>Steel Crossfire</em></li>
-      <li>finishing my CS undergrad and pretending I'll be productive over winter break</li>
+      <li>co-owner of <a href="https://www.roblox.com/communities/5670504/TOPLINE-STUDIOS-INC"><strong>Topline Studios</strong></a>, where I lead game and UI design on our game <em>Mafia</em></li>
+      <li>UI designer at <a href="https://www.roblox.com/communities/33895110/Marmots-Oven"><strong>Marmot's Oven</strong></a>, working on <em>Steel Crossfire</em></li>
+      <li>studying my CS undergrad and pretending I'll be productive over winter break</li>
     </ul>
 
     <h2>stack</h2>
-    <pre><code>languages   python, c, javascript, lua (still warming up to it)
-design      figma, photoshop, after effects, blender (badly)
-engines     roblox studio, unity (rusty)
+    <pre><code>languages   python, c, java (thanks, FER)
+design      photoshop, not figma, after effects (badly)
+engines     roblox studio
 os          arch + hyprland, because i hate myself in a fun way
 editor      vscode. yes, i know. this will anger purists.
             vim and emacs got pacman -Rns'd off my system and i sleep great.</code></pre>
+
+    <h2>hobbies</h2>
+    <details class="hobbies">
+      <summary>uh oh here it comes</summary>
+      <ul>
+        <li>programming</li>
+        <li>playing game dev tycoon irl</li>
+        <li>messing with linux</li>
+        <li>gaming</li>
+        <li>hating on Rust <span class="aside">(just admit you suck at using malloc lmfao)</span></li>
+        <li>ui design</li>
+        <li>running random models found on huggingface</li>
+        <li>sci-fi</li>
+        <li>working on random projects</li>
+        <li>exploring niche media</li>
+        <li>watching anime when i run out of ideas</li>
+        <li>doomscrolling during critical lectures</li>
+        <li>pondering philosophy while showering</li>
+        <li>listening to indie music</li>
+        <li>occasionally breaking software</li>
+        <li>wasting time on side quests</li>
+        <li>touching grass</li>
+        <li>probably more stuff i forgot idk</li>
+      </ul>
+    </details>
 
     <h2>elsewhere</h2>
     <ul class="links">
       <li><a href="https://twitter.com/octanebula">xitter</a></li>
       <li><a href="https://github.com/octanebula">github</a></li>
-      <li><a href="https://www.roblox.com/users/octanebula">roblox</a></li>
-      <li><a href="mailto:hi@octanebula.dev">hi@octanebula.dev</a></li>
+      <li><a href="https://www.roblox.com/users/162871269/profile">roblox</a></li>
+      <li><span class="wip-email">hi@octanebula.dev<span class="wip-bubble">wip!</span></span></li>
     </ul>
 
     <h2>why this page exists</h2>
@@ -95,7 +120,8 @@ editor      vscode. yes, i know. this will anger purists.
   .md > p,
   .md > ul,
   .md > pre,
-  .md > blockquote {
+  .md > blockquote,
+  .md > details {
     background: rgba(16, 20, 42, 0.55);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -126,9 +152,9 @@ editor      vscode. yes, i know. this will anger purists.
   .md h3 { font-size: 1rem;    padding-top: 1.2rem; padding-bottom: 0.3rem; }
 
   .md h1, .md h2, .md h3 { transition: padding-left 140ms ease; }
-  .md h1:hover { padding-left: 2.4rem; }
-  .md h2:hover { padding-left: 2.6rem; }
-  .md h3:hover { padding-left: 2.8rem; }
+  .md h1:hover { padding-left: 2.5rem; }
+  .md h2:hover { padding-left: 2.8rem; }
+  .md h3:hover { padding-left: 4.2rem; }
 
   .md h1::before,
   .md h2::before,
@@ -141,9 +167,9 @@ editor      vscode. yes, i know. this will anger purists.
     font-weight: 400;
     pointer-events: none;
   }
-  .md h1::before { content: '#'; }
-  .md h2::before { content: '##'; }
-  .md h3::before { content: '###'; }
+  .md h1::before { content: '#\00a0'; }
+  .md h2::before { content: '##\00a0'; }
+  .md h3::before { content: '###\00a0'; }
   .md h1:hover::before,
   .md h2:hover::before,
   .md h3:hover::before { opacity: 0.55; }
@@ -242,6 +268,66 @@ editor      vscode. yes, i know. this will anger purists.
   .md blockquote:hover::before { opacity: 0.55; }
   .md blockquote:hover { padding-left: 1.6rem; }
   .md blockquote { transition: padding-left 140ms ease; }
+
+  .md details.hobbies { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+  .md details.hobbies summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-block;
+    color: var(--fg-dim);
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    font-size: 0.95rem;
+  }
+  .md details.hobbies summary:hover { color: var(--fg); }
+  .md details.hobbies summary::-webkit-details-marker { display: none; }
+  .md details.hobbies summary::before {
+    content: '▸ ';
+    color: var(--fg-dim);
+    transition: transform 140ms ease;
+    display: inline-block;
+  }
+  .md details.hobbies[open] summary::before {
+    content: '▾ ';
+  }
+  .md details.hobbies summary:hover { filter: brightness(1.15); }
+  .md details.hobbies ul { padding-left: 1.1rem; margin-top: 0.5rem; }
+  .md details.hobbies ul li {
+    position: relative;
+    padding-left: 1.1rem;
+    margin: 0.25rem 0;
+  }
+  .md details.hobbies ul li::before {
+    content: '-';
+    position: absolute;
+    left: 0;
+    color: var(--fg-dim);
+  }
+  .md .aside {
+    color: var(--fg-dim);
+    font-style: italic;
+  }
+
+  /* extend inline mark hover behavior into details */
+  .md details li strong::before, .md details li strong::after,
+  .md details li em::before, .md details li em::after,
+  .md details li code::before, .md details li code::after {
+    color: var(--fg-dim);
+    opacity: 0;
+    font-size: 0;
+    font-weight: 400;
+    font-style: normal;
+    transition: opacity 140ms ease, font-size 140ms ease;
+  }
+  .md details li strong::before, .md details li strong::after { content: '**'; }
+  .md details li em::before, .md details li em::after { content: '*'; }
+  .md details li code::before, .md details li code::after { content: '`'; }
+  .md details li strong:hover::before, .md details li strong:hover::after,
+  .md details li em:hover::before, .md details li em:hover::after,
+  .md details li code:hover::before, .md details li code:hover::after {
+    opacity: 0.55;
+    font-size: inherit;
+  }
 
   .md .signoff {
     text-align: center;

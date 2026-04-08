@@ -15,6 +15,37 @@ const tags = ['all', 'shipped', 'wip', 'writing', 'note', 'release'] as const;
 function fmtDate(d: Date) {
   return d.toISOString().slice(0, 10);
 }
+
+function fmtNum(n: number) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+  return String(n);
+}
+
+// Build-time fetch: pull current visit count + active player count for any
+// pinned card whose entry id appears here. Fails silently per-game so a
+// network hiccup never breaks the build.
+const robloxPlaces: Record<string, number> = {
+  'mafia-pinned': 113232329524315,
+  'steel-crossfire-pinned': 133197203959042,
+};
+
+const liveStats: Record<string, { visits: number; playing: number }> = {};
+await Promise.all(
+  Object.entries(robloxPlaces).map(async ([entryId, placeId]) => {
+    try {
+      const u = await fetch(`https://apis.roblox.com/universes/v1/places/${placeId}/universe`);
+      const { universeId } = await u.json();
+      const g = await fetch(`https://games.roblox.com/v1/games?universeIds=${universeId}`);
+      const { data } = await g.json();
+      if (data?.[0]) {
+        liveStats[entryId] = { visits: data[0].visits, playing: data[0].playing };
+      }
+    } catch {
+      // skip this game
+    }
+  })
+);
 ---
 <Base>
   <header class="hero">
@@ -22,19 +53,21 @@ function fmtDate(d: Date) {
       <Image class="pfp" src={pfp} alt="Octavian" width={144} height={144} loading="eager" />
       <div class="hero-text">
         <div class="name-row">
-          <h1>Octavian <span class="alias">@octanebula</span></h1>
-          <span class="check" title="Verified Roblox developer">✓</span>
+          <h1>Octavian</h1>
+          <span class="alias">@octanebula</span>
         </div>
         <p class="bio">
-          19, CS undergrad in Croatia. Co-owner of <strong>Topline Studios</strong>,
-          UI designer at <strong>Marmot's Oven</strong>. I make Roblox games and
-          write code.
+          19, CS undergrad in Croatia. Co-owner of
+          <a href="https://www.roblox.com/communities/5670504/TOPLINE-STUDIOS-INC"><strong>Topline Studios</strong></a>,
+          UI designer at
+          <a href="https://www.roblox.com/communities/33895110/Marmots-Oven"><strong>Marmot's Oven</strong></a>.
+          I make Roblox games and write code.
         </p>
         <nav class="socials">
           <a href="https://twitter.com/octanebula">xitter</a>
           <a href="https://github.com/octanebula">github</a>
-          <a href="https://www.roblox.com/users/octanebula">roblox</a>
-          <a href="mailto:hi@octanebula.dev">email</a>
+          <a href="https://www.roblox.com/users/162871269/profile">roblox</a>
+          <span class="wip-email">email<span class="wip-bubble">wip!</span></span>
         </nav>
       </div>
     </div>
@@ -55,6 +88,12 @@ function fmtDate(d: Date) {
                 ? <a href={entry.data.link}>{entry.data.title}</a>
                 : entry.data.title}
             </h3>
+            {liveStats[entry.id] && (
+              <div class="live-stats">
+                <span class="stat"><strong>{fmtNum(liveStats[entry.id].visits)}</strong> visits</span>
+                <span class="stat"><span class="live-dot"></span><strong>{fmtNum(liveStats[entry.id].playing)}</strong> playing</span>
+              </div>
+            )}
             <div class="entry-body" set:html={entry.rendered?.html ?? ''} />
           </li>
         ))}
@@ -133,13 +172,14 @@ function fmtDate(d: Date) {
     background: var(--bg-elev);
   }
   .hero-text { min-width: 0; }
-  .name-row { display: flex; align-items: center; gap: 0.55rem; }
-  h1 { font-size: 1.6rem; margin: 0; }
-  .alias { color: var(--fg-dim); font-weight: 400; font-family: var(--mono); font-size: 0.95rem; margin-left: 0.35rem; }
-  .check {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 1.1rem; height: 1.1rem; border-radius: 999px;
-    background: var(--accent); color: #0b0c0e; font-size: 0.7rem; font-weight: 800;
+  .name-row { display: flex; align-items: center; gap: 0.6rem; }
+  h1 { font-size: 1.6rem; margin: 0; line-height: 1; }
+  .alias {
+    color: var(--fg-dim);
+    font-weight: 400;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    line-height: 1;
   }
   .bio { color: var(--fg); margin: 0.6rem 0 1rem; }
   .bio strong { color: var(--accent); font-weight: 600; }
@@ -214,5 +254,30 @@ function fmtDate(d: Date) {
     content: '★ ';
     color: var(--tag-wip);
     font-size: 0.85em;
+  }
+
+  .live-stats {
+    display: flex;
+    gap: 1rem;
+    margin: 0.1rem 0 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--fg-dim);
+    align-items: center;
+  }
+  .live-stats .stat { display: inline-flex; align-items: center; gap: 0.35rem; }
+  .live-stats strong { color: var(--fg); font-weight: 600; }
+  .live-dot {
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--tag-shipped);
+    box-shadow: 0 0 6px var(--tag-shipped);
+    animation: live-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes live-pulse {
+    0%, 100% { opacity: 0.6; transform: scale(0.9); }
+    50%      { opacity: 1;   transform: scale(1.1); }
   }
 </style>

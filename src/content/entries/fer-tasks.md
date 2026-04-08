@@ -1,6 +1,6 @@
 ---
 title: "fer-ict-tasks"
-date: 2025-04-02
+date: 2025-09-29
 tag: note
 link: https://github.com/octanebula/fer-ict-tasks
 ---
