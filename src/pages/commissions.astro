@@ -324,6 +324,9 @@ import Base from '../layouts/Base.astro';
     pointer-events: none;
   }
   .quote:hover .caption { transform: translateY(0); }
+  @media (hover: none) {
+    .quote .caption { transform: translateY(0); }
+  }
   .quote .handle {
     font-weight: 600;
     color: var(--fg);
