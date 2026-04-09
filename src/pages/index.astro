@@ -25,6 +25,8 @@ function fmtNum(n: number) {
 // Build-time fetch: pull current visit count + active player count for any
 // pinned card whose entry id appears here. Fails silently per-game so a
 // network hiccup never breaks the build.
+const buildISO = new Date().toISOString();
+
 const robloxPlaces: Record<string, number> = {
   'mafia-pinned': 113232329524315,
   'steel-crossfire-pinned': 133197203959042,
@@ -92,6 +94,10 @@ await Promise.all(
               <div class="live-stats">
                 <span class="stat"><strong>{fmtNum(liveStats[entry.id].visits)}</strong> visits</span>
                 <span class="stat"><span class="live-dot"></span><strong>{fmtNum(liveStats[entry.id].playing)}</strong> playing</span>
+                <span class="info-wrap">
+                  <span class="info-icon">ⓘ</span>
+                  <span class="info-tip" data-build={buildISO}>last updated: just now</span>
+                </span>
               </div>
             )}
             <div class="entry-body" set:html={entry.rendered?.html ?? ''} />
@@ -128,6 +134,23 @@ await Promise.all(
 </Base>
 
 <script>
+  // compute relative "X ago" for build timestamps
+  function timeAgo(iso: string): string {
+    const diff = Date.now() - new Date(iso).getTime();
+    const s = Math.floor(diff / 1000);
+    if (s < 60) return 'just now';
+    const m = Math.floor(s / 60);
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    const d = Math.floor(h / 24);
+    return `${d}d ago`;
+  }
+  document.querySelectorAll<HTMLElement>('.info-tip[data-build]').forEach((tip) => {
+    const iso = tip.dataset.build;
+    if (iso) tip.textContent = `last updated: ${timeAgo(iso)}`;
+  });
+
   const buttons = document.querySelectorAll<HTMLButtonElement>('.filter');
   const items = document.querySelectorAll<HTMLLIElement>('.feed .entry');
   let active = 'all';
@@ -203,8 +226,11 @@ await Promise.all(
     border-radius: 6px;
   }
 
-  .feed-header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-  .filters { display: flex; gap: 0.4rem; }
+  .feed-header { display: flex; align-items: baseline; justify-content: space-between; gap: 0.65rem; flex-wrap: wrap; }
+  .filters { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  @media (max-width: 600px) {
+    .feed-header { flex-direction: column; align-items: flex-start; }
+  }
   .filter {
     background: rgba(19, 20, 24, 0.72);
     backdrop-filter: blur(8px);
@@ -279,5 +305,50 @@ await Promise.all(
   @keyframes live-pulse {
     0%, 100% { opacity: 0.6; transform: scale(0.9); }
     50%      { opacity: 1;   transform: scale(1.1); }
+  }
+
+  .info-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.15rem;
+  }
+  .info-icon {
+    font-size: 0.82rem;
+    color: var(--fg-dim);
+    cursor: help;
+    user-select: none;
+  }
+  .info-tip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-bottom: 0.5rem;
+    transform: translate(-50%, 4px);
+    padding: 0.25rem 0.55rem;
+    background: rgba(16, 20, 42, 0.95);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--fg);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+  .info-tip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--border);
+  }
+  .info-wrap:hover .info-tip,
+  .info-wrap:focus-within .info-tip {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
 </style>

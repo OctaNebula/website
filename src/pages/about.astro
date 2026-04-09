@@ -243,6 +243,7 @@ editor      vscode. yes, i know. this will anger purists.
   .md pre {
     overflow-x: auto;
     background: rgba(7, 9, 26, 0.7);
+    -webkit-overflow-scrolling: touch;
   }
   .md pre code {
     font-family: var(--mono);
@@ -250,6 +251,9 @@ editor      vscode. yes, i know. this will anger purists.
     color: var(--fg);
     white-space: pre;
     display: block;
+  }
+  @media (max-width: 600px) {
+    .md pre code { font-size: 0.74rem; }
   }
 
   .md blockquote {
