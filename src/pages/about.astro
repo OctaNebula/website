@@ -89,6 +89,7 @@ editor      vscode. yes, i know. this will anger purists.
     line-height: 1.65;
     color: var(--fg);
     max-width: 100%;
+    overflow-x: hidden;
   }
 
   .filebar {
@@ -253,7 +254,14 @@ editor      vscode. yes, i know. this will anger purists.
     display: block;
   }
   @media (max-width: 600px) {
-    .md pre code { font-size: 0.74rem; }
+    .md > h1, .md > h2, .md > h3,
+    .md > p, .md > ul, .md > pre,
+    .md > blockquote, .md > details { padding-left: 0.7rem; padding-right: 0.7rem; }
+    .md pre code {
+      font-size: 0.74rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
   }
 
   .md blockquote {
