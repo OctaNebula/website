@@ -65,40 +65,40 @@ editor      vscode. yes, i know. this will anger purists.
     </details>
 
     <h2>asked</h2>
-    <dl class="qa">
-      <div class="qa-item">
-        <dt>favorite video game?</dt>
-        <dd>hard to say because there's so many. maybe that title would go to the Command & Conquer series because I grew up on it. otherwise honourable mentions can go to Minecraft, Titanfall 2, Dead by Daylight and Persona 5 <em>(and roblox obviously)</em></dd>
-      </div>
-      <div class="qa-item">
-        <dt>favorite programming language?</dt>
-        <dd>HolyC. too bad I don't know it</dd>
-      </div>
-      <div class="qa-item">
-          <dt>coffee or energy drinks?</dt>
-          <dd>coffee, obviously. specifically macchiato or nocciola when possible</dd>
-      </div>
-      <div class="qa-item">
-        <dt>favorite anime?</dt>
-        <dd>it would absolutely have to be 86. otherwise, specific parts of SAO.</dd>
-      </div>
-      <div class="qa-item">
-        <dt>why arch + hyprland?</dt>
-        <dd>because I'm a software control freak. simple as.</dd>
-      </div>
-      <div class="qa-item">
-        <dt>how did you get into roblox dev?</dt>
-        <dd>it all actually started when I came to the magic realization that I'm good at photoshop. four years of grind later i'm somehow verified. <em>(still not sure how that happened)</em></dd>
-      </div>
-      <div class="qa-item">
-        <dt>MBTI?</dt>
-        <dd>although i consider MBTI utter bullshit, for your convenience it's ENTP-A <em>(by the way the ONLY reason I know this is because my uni forced me to take this at gunpoint for a course)</em></dd>
-      </div>
-      <div class="qa-item">
-        <dt>scariest thing you've ever shipped to production?</dt>
-        <dd>a UI overhaul that went live without me scaling it at all. found out via getting spam pinged. don't be me.</dd>
-      </div>
-    </dl>
+    <div class="qa">
+      <details class="qa-item">
+        <summary>favorite video game?</summary>
+        <div class="qa-answer">hard to say because there's so many. maybe that title would go to the Command & Conquer series because I grew up on it. otherwise honourable mentions can go to Minecraft, Titanfall 2, Dead by Daylight and Persona 5 <em>(and roblox obviously)</em></div>
+      </details>
+      <details class="qa-item">
+        <summary>favorite programming language?</summary>
+        <div class="qa-answer">HolyC. too bad I don't know it</div>
+      </details>
+      <details class="qa-item">
+        <summary>coffee or energy drinks?</summary>
+        <div class="qa-answer">coffee, obviously. specifically macchiato or nocciola when possible</div>
+      </details>
+      <details class="qa-item">
+        <summary>favorite anime?</summary>
+        <div class="qa-answer">it would absolutely have to be 86. otherwise, specific parts of SAO.</div>
+      </details>
+      <details class="qa-item">
+        <summary>why arch + hyprland?</summary>
+        <div class="qa-answer">because I'm a software control freak. simple as.</div>
+      </details>
+      <details class="qa-item">
+        <summary>how did you get into roblox dev?</summary>
+        <div class="qa-answer">it all actually started when I came to the magic realization that I'm good at photoshop. four years of grind later i'm somehow verified. <em>(still not sure how that happened)</em></div>
+      </details>
+      <details class="qa-item">
+        <summary>MBTI?</summary>
+        <div class="qa-answer">although i consider MBTI utter bullshit, for your convenience it's ENTP-A <em>(by the way the ONLY reason I know this is because my uni forced me to take this at gunpoint for a course)</em></div>
+      </details>
+      <details class="qa-item">
+        <summary>scariest thing you've ever shipped to production?</summary>
+        <div class="qa-answer">a UI overhaul that went live without me scaling it at all. found out via getting spam pinged. don't be me.</div>
+      </details>
+    </div>
 
     <h2>elsewhere</h2>
     <ul class="links">
@@ -153,7 +153,7 @@ editor      vscode. yes, i know. this will anger purists.
   .md > pre,
   .md > blockquote,
   .md > details,
-  .md > dl {
+  .md > .qa {
     background: rgba(16, 20, 42, 0.55);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -351,32 +351,42 @@ editor      vscode. yes, i know. this will anger purists.
     font-style: italic;
   }
 
-  /* asked / Q&A list */
-  .md dl.qa { margin: 0; padding-top: 0.4rem; padding-bottom: 0.4rem; }
-  .md .qa-item { padding: 0.55rem 0; }
-  .md .qa-item + .qa-item { border-top: 1px dashed var(--border); margin-top: 0.4rem; padding-top: 0.85rem; }
-  .md .qa dt {
+  /* asked / Q&A list (collapsible) */
+  .md .qa { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  .md .qa-item { padding: 0.4rem 0; }
+  .md .qa-item + .qa-item {
+    border-top: 1px dashed rgba(255, 255, 255, 0.12);
+    margin-top: 0.3rem;
+    padding-top: 0.7rem;
+  }
+  .md .qa-item summary {
     position: relative;
     padding-left: 1.4rem;
     color: var(--fg);
     font-weight: 600;
-    margin-bottom: 0.35rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
   }
-  .md .qa dt::before {
+  .md .qa-item summary::-webkit-details-marker { display: none; }
+  .md .qa-item summary::before {
     content: 'Q';
     position: absolute;
     left: 0;
     color: var(--accent);
     font-family: var(--mono);
     font-weight: 700;
+    transition: transform 160ms ease;
   }
-  .md .qa dd {
+  .md .qa-item[open] summary::before { transform: rotate(360deg); }
+  .md .qa-item summary:hover { color: var(--accent); }
+  .md .qa-answer {
     position: relative;
-    margin: 0;
+    margin: 0.45rem 0 0;
     padding-left: 1.4rem;
     color: var(--fg);
   }
-  .md .qa dd::before {
+  .md .qa-answer::before {
     content: 'A';
     position: absolute;
     left: 0;
@@ -389,9 +399,9 @@ editor      vscode. yes, i know. this will anger purists.
   .md details li strong::before, .md details li strong::after,
   .md details li em::before, .md details li em::after,
   .md details li code::before, .md details li code::after,
-  .md dd strong::before, .md dd strong::after,
-  .md dd em::before, .md dd em::after,
-  .md dd code::before, .md dd code::after {
+  .md .qa-answer strong::before, .md .qa-answer strong::after,
+  .md .qa-answer em::before, .md .qa-answer em::after,
+  .md .qa-answer code::before, .md .qa-answer code::after {
     color: var(--fg-dim);
     opacity: 0;
     font-size: 0;
@@ -400,17 +410,17 @@ editor      vscode. yes, i know. this will anger purists.
     transition: opacity 140ms ease, font-size 140ms ease;
   }
   .md details li strong::before, .md details li strong::after,
-  .md dd strong::before, .md dd strong::after { content: '**'; }
+  .md .qa-answer strong::before, .md .qa-answer strong::after { content: '**'; }
   .md details li em::before, .md details li em::after,
-  .md dd em::before, .md dd em::after { content: '*'; }
+  .md .qa-answer em::before, .md .qa-answer em::after { content: '*'; }
   .md details li code::before, .md details li code::after,
-  .md dd code::before, .md dd code::after { content: '`'; }
+  .md .qa-answer code::before, .md .qa-answer code::after { content: '`'; }
   .md details li strong:hover::before, .md details li strong:hover::after,
   .md details li em:hover::before, .md details li em:hover::after,
   .md details li code:hover::before, .md details li code:hover::after,
-  .md dd strong:hover::before, .md dd strong:hover::after,
-  .md dd em:hover::before, .md dd em:hover::after,
-  .md dd code:hover::before, .md dd code:hover::after {
+  .md .qa-answer strong:hover::before, .md .qa-answer strong:hover::after,
+  .md .qa-answer em:hover::before, .md .qa-answer em:hover::after,
+  .md .qa-answer code:hover::before, .md .qa-answer code:hover::after {
     opacity: 0.55;
     font-size: inherit;
   }
