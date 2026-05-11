@@ -47,7 +47,7 @@ editor      vscode. yes, i know. this will anger purists.
         <li>playing game dev tycoon irl</li>
         <li>messing with linux</li>
         <li>gaming</li>
-        <li>hating on Rust <span class="aside">(just admit you suck at using malloc lmfao)</span></li>
+        <li>hating on rust <span class="aside">(just admit you suck at using malloc lmfao)</span></li>
         <li>ui design</li>
         <li>running random models found on huggingface</li>
         <li>sci-fi</li>
@@ -72,11 +72,13 @@ editor      vscode. yes, i know. this will anger purists.
       <li><span class="wip-email">hi@octanebula.dev<span class="wip-bubble">wip!</span></span></li>
     </ul>
 
-    <h2>why this page exists</h2>
-    <blockquote>
-      I kept procrastinating on rebuilding my site. Then I got verified, then
-      I paid for Claude Max, and the guilt finally outweighed the laziness.
-    </blockquote>
+    <h2>asked</h2>
+    <dl class="qa">
+      <div class="qa-item">
+        <dt>placeholder question goes here?</dt>
+        <dd>placeholder answer goes here. write whatever, supports <strong>bold</strong>, <em>italic</em>, and <code>inline code</code>.</dd>
+      </div>
+    </dl>
 
     <p class="signoff">— end of file —</p>
   </article>
@@ -122,7 +124,8 @@ editor      vscode. yes, i know. this will anger purists.
   .md > ul,
   .md > pre,
   .md > blockquote,
-  .md > details {
+  .md > details,
+  .md > dl {
     background: rgba(16, 20, 42, 0.55);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -320,10 +323,47 @@ editor      vscode. yes, i know. this will anger purists.
     font-style: italic;
   }
 
-  /* extend inline mark hover behavior into details */
+  /* asked / Q&A list */
+  .md dl.qa { margin: 0; padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  .md .qa-item { padding: 0.55rem 0; }
+  .md .qa-item + .qa-item { border-top: 1px dashed var(--border); margin-top: 0.4rem; padding-top: 0.85rem; }
+  .md .qa dt {
+    position: relative;
+    padding-left: 1.4rem;
+    color: var(--fg);
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+  .md .qa dt::before {
+    content: 'Q';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+  .md .qa dd {
+    position: relative;
+    margin: 0;
+    padding-left: 1.4rem;
+    color: var(--fg);
+  }
+  .md .qa dd::before {
+    content: 'A';
+    position: absolute;
+    left: 0;
+    color: var(--fg-dim);
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+
+  /* extend inline mark hover behavior into details + Q&A */
   .md details li strong::before, .md details li strong::after,
   .md details li em::before, .md details li em::after,
-  .md details li code::before, .md details li code::after {
+  .md details li code::before, .md details li code::after,
+  .md dd strong::before, .md dd strong::after,
+  .md dd em::before, .md dd em::after,
+  .md dd code::before, .md dd code::after {
     color: var(--fg-dim);
     opacity: 0;
     font-size: 0;
@@ -331,12 +371,18 @@ editor      vscode. yes, i know. this will anger purists.
     font-style: normal;
     transition: opacity 140ms ease, font-size 140ms ease;
   }
-  .md details li strong::before, .md details li strong::after { content: '**'; }
-  .md details li em::before, .md details li em::after { content: '*'; }
-  .md details li code::before, .md details li code::after { content: '`'; }
+  .md details li strong::before, .md details li strong::after,
+  .md dd strong::before, .md dd strong::after { content: '**'; }
+  .md details li em::before, .md details li em::after,
+  .md dd em::before, .md dd em::after { content: '*'; }
+  .md details li code::before, .md details li code::after,
+  .md dd code::before, .md dd code::after { content: '`'; }
   .md details li strong:hover::before, .md details li strong:hover::after,
   .md details li em:hover::before, .md details li em:hover::after,
-  .md details li code:hover::before, .md details li code:hover::after {
+  .md details li code:hover::before, .md details li code:hover::after,
+  .md dd strong:hover::before, .md dd strong:hover::after,
+  .md dd em:hover::before, .md dd em:hover::after,
+  .md dd code:hover::before, .md dd code:hover::after {
     opacity: 0.55;
     font-size: inherit;
   }
