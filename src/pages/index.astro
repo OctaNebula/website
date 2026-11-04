@@ -3,6 +3,10 @@ import Base from '../layouts/Base.astro';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import pfp from '../assets/pfp.jpg';
+import { getStats, robloxPlaces } from '../lib/roblox';
+import { fmtNum } from '../lib/format';
+
+export const prerender = false;
 
 const all = await getCollection('entries');
 all.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
@@ -16,38 +20,10 @@ function fmtDate(d: Date) {
   return d.toISOString().slice(0, 10);
 }
 
-function fmtNum(n: number) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
-  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
-  return String(n);
-}
-
-// Build-time fetch: pull current visit count + active player count for any
-// pinned card whose entry id appears here. Fails silently per-game so a
-// network hiccup never breaks the build.
-const buildISO = new Date().toISOString();
-
-const robloxPlaces: Record<string, number> = {
-  'mafia-pinned': 113232329524315,
-  'steel-crossfire-pinned': 133197203959042,
-};
-
-const liveStats: Record<string, { visits: number; playing: number }> = {};
-await Promise.all(
-  Object.entries(robloxPlaces).map(async ([entryId, placeId]) => {
-    try {
-      const u = await fetch(`https://apis.roblox.com/universes/v1/places/${placeId}/universe`);
-      const { universeId } = await u.json();
-      const g = await fetch(`https://games.roblox.com/v1/games?universeIds=${universeId}`);
-      const { data } = await g.json();
-      if (data?.[0]) {
-        liveStats[entryId] = { visits: data[0].visits, playing: data[0].playing };
-      }
-    } catch {
-      // skip this game
-    }
-  })
-);
+// Rendered per request on the VPS so the pinned cards show live Roblox
+// numbers; the client script below then polls /api/stats.json to keep them
+// ticking. Roblox is only hit through the cached getStats() in lib/roblox.
+const stats = await getStats();
 ---
 <Base>
   <header class="hero">
@@ -90,13 +66,13 @@ await Promise.all(
                 ? <a href={entry.data.link}>{entry.data.title}</a>
                 : entry.data.title}
             </h3>
-            {liveStats[entry.id] && (
-              <div class="live-stats">
-                <span class="stat"><strong>{fmtNum(liveStats[entry.id].visits)}</strong> visits</span>
-                <span class="stat"><span class="live-dot"></span><strong>{fmtNum(liveStats[entry.id].playing)}</strong> playing</span>
+            {entry.id in robloxPlaces && (
+              <div class="live-stats" data-stats={entry.id} hidden={!stats.games[entry.id]}>
+                <span class="stat"><strong data-k="visits">{stats.games[entry.id] ? fmtNum(stats.games[entry.id].visits) : '-'}</strong> visits</span>
+                <span class="stat"><span class="live-dot"></span><strong data-k="playing">{stats.games[entry.id] ? fmtNum(stats.games[entry.id].playing) : '-'}</strong> playing</span>
                 <span class="info-wrap">
                   <svg class="info-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.8" fill="currentColor"/></svg>
-                  <span class="info-tip" data-build={buildISO}>last updated: just now</span>
+                  <span class="info-tip" data-updated={stats.updated ?? ''}>last updated: just now</span>
                 </span>
               </div>
             )}
@@ -134,7 +110,9 @@ await Promise.all(
 </Base>
 
 <script>
-  // compute relative "X ago" for build timestamps
+  import { fmtNum } from '../lib/format';
+
+  // relative "X ago" for the stats timestamp
   function timeAgo(iso: string): string {
     const diff = Date.now() - new Date(iso).getTime();
     const s = Math.floor(diff / 1000);
@@ -146,10 +124,51 @@ await Promise.all(
     const d = Math.floor(h / 24);
     return `${d}d ago`;
   }
-  document.querySelectorAll<HTMLElement>('.info-tip[data-build]').forEach((tip) => {
-    const iso = tip.dataset.build;
-    if (iso) tip.textContent = `last updated: ${timeAgo(iso)}`;
-  });
+
+  // live stats: poll our own /api/stats.json (cached server-side, so this
+  // never hits Roblox directly) every 30s while the tab is visible
+  const POLL_MS = 30_000;
+  const statBlocks = document.querySelectorAll<HTMLElement>('.live-stats[data-stats]');
+  const tips = document.querySelectorAll<HTMLElement>('.info-tip[data-updated]');
+  let updated = tips[0]?.dataset.updated ?? '';
+  let lastPoll = Date.now();
+
+  function renderUpdated() {
+    tips.forEach((tip) => {
+      tip.textContent = updated ? `last updated: ${timeAgo(updated)}` : 'last updated: never';
+    });
+  }
+
+  async function pollStats() {
+    lastPoll = Date.now();
+    try {
+      const res = await fetch('/api/stats.json', { cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.updated) updated = data.updated;
+      statBlocks.forEach((block) => {
+        const g = data.games?.[block.dataset.stats ?? ''];
+        if (!g) return;
+        const visits = block.querySelector('[data-k="visits"]');
+        const playing = block.querySelector('[data-k="playing"]');
+        if (visits) visits.textContent = fmtNum(g.visits);
+        if (playing) playing.textContent = fmtNum(g.playing);
+        block.hidden = false;
+      });
+    } catch {
+      // keep showing the last numbers we had
+    } finally {
+      renderUpdated();
+    }
+  }
+
+  renderUpdated();
+  if (statBlocks.length > 0) {
+    setInterval(() => { if (!document.hidden) pollStats(); }, POLL_MS);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && Date.now() - lastPoll >= POLL_MS) pollStats();
+    });
+  }
 
   const buttons = document.querySelectorAll<HTMLButtonElement>('.filter');
   const items = document.querySelectorAll<HTMLLIElement>('.feed .entry');
@@ -291,6 +310,7 @@ await Promise.all(
     color: var(--fg-dim);
     align-items: center;
   }
+  .live-stats[hidden] { display: none; }
   .live-stats .stat { display: inline-flex; align-items: center; gap: 0.35rem; }
   .live-stats strong { color: var(--fg); font-weight: 600; }
   .live-dot {
